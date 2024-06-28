@@ -459,6 +459,8 @@ class RNGestureHandlerModule(reactContext: ReactApplicationContext?) :
   }
 
   private external fun decorateRuntime(jsiPtr: Long)
+  private val REACT_NATIVE_MINOR_VERSION = 74
+  private val IS_NEW_ARCHITECTURE_ENABLED = false
 
   override fun getConstants(): Map<String, Any> {
     return mapOf(
@@ -545,12 +547,12 @@ class RNGestureHandlerModule(reactContext: ReactApplicationContext?) :
         val event = RNGestureHandlerEvent.obtain(
           handler,
           handlerFactory.createEventBuilder(handler),
-          useTopPrefixedName = BuildConfig.REACT_NATIVE_MINOR_VERSION >= 71
+          useTopPrefixedName = REACT_NATIVE_MINOR_VERSION >= 71
         )
         sendEventForNativeAnimatedEvent(event)
       } else if (handler.actionType == GestureHandler.ACTION_TYPE_JS_FUNCTION_OLD_API) {
         // JS function, Animated.event with useNativeDriver: false using old API
-        if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+        if (IS_NEW_ARCHITECTURE_ENABLED) {
           val data = RNGestureHandlerEvent.createEventData(handlerFactory.createEventBuilder(handler))
           sendEventForDeviceEvent(RNGestureHandlerEvent.EVENT_NAME, data)
         } else {
@@ -582,7 +584,7 @@ class RNGestureHandlerModule(reactContext: ReactApplicationContext?) :
       handler.actionType == GestureHandler.ACTION_TYPE_JS_FUNCTION_OLD_API
     ) {
       // JS function or Animated.event with useNativeDriver: false with old API
-      if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+      if (IS_NEW_ARCHITECTURE_ENABLED) {
         val data = RNGestureHandlerStateChangeEvent.createEventData(handlerFactory.createEventBuilder(handler), newState, oldState)
         sendEventForDeviceEvent(RNGestureHandlerStateChangeEvent.EVENT_NAME, data)
       } else {
@@ -620,7 +622,7 @@ class RNGestureHandlerModule(reactContext: ReactApplicationContext?) :
 
   private fun <T : Event<T>>sendEventForReanimated(event: T) {
     // Delivers the event to Reanimated.
-    if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+    if (IS_NEW_ARCHITECTURE_ENABLED) {
       // Send event directly to Reanimated
       reanimatedEventDispatcher.sendEvent(event, reactApplicationContext)
     } else {
